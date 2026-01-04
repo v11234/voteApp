@@ -5,11 +5,11 @@ import Image from "../assets/404.gif"
 function ErrorPage() {
     const navigate=useNavigate();
     //redirect to previous page after 6 seconds
-    useEffect(() => {
-        setTimeout(() => {
-            navigate(-1);
-        }, 6000);
-    })
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         navigate(-1);
+    //     }, 6000);
+    // })
   return (
   <section className="errorPage">
     <div className="errorPage_container">

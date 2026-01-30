@@ -22,6 +22,7 @@ function ResultElection({id,thumbnail,title,}) {
             }
         </ul>
         <Link to={`/elections/${id}/candidates`} className="btn primary full">Enter Elections</Link>
+       
    </article>
   )
 }

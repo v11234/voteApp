@@ -12,9 +12,9 @@ const addElection=async(req,res,next)=>{
 try {
 //     only admin can add election
 
-// if(!req.user.isAdmin){
-//     return next(new HttpError("Only admin can perform this action",403))  
-//}
+if(!req.user.isAdmin){
+    return next(new HttpError("Only admin can perform this action",403))  
+}
 const {title,description}=req.body;
 if(!title||!description){
     return next(new HttpError("All fields required",422)) ;
@@ -29,13 +29,14 @@ const {thumbnail}=req.files;
 if(thumbnail.size>1000000){
      return next(new HttpError("file size too big .Should be less than 1mb",422))  
 }
-console.log("working")
+
 //rename the image
 
-let fileName=thumbnail.fileName
+let fileName=thumbnail.name
 fileName=fileName.split(".");
 fileName=fileName[0] + uuid() +"." + fileName[fileName.length - 1]
 
+ console.log("working up to hear")
 //upload files to uplaod folder in project
 
 await thumbnail.mv(path.join(__dirname,'..','uploads',fileName),async(err)=>{
@@ -54,7 +55,6 @@ await thumbnail.mv(path.join(__dirname,'..','uploads',fileName),async(err)=>{
     const newElection= await electionModel.create({title,description,thumbnail:result.secure_url});
     res.json(newElection);
 })
-res.json(req.body)
 } catch (error) {
      return next(new HttpError("Error in creating new election",422))  
 }
@@ -87,7 +87,7 @@ try {
 
 const getElection=async(req,res,next)=>{
 try {
-     const {id}=req.param;
+     const {id}=req.params;
      const election=await electionModel.findById(id)
       res.status(200).json(election)
 } catch (error) {
@@ -106,7 +106,7 @@ try {
 
 const getCandidateOfElection=async(req,res,next)=>{
 try {
-      const {id}=req.param;
+      const {id}=req.params;
       const candidate= await candidateModel.find({election:id})
        res.status(200).json(candidate)
 } catch (error) {
@@ -130,7 +130,7 @@ try {
 
 const getElectionVoters=async(req,res,next)=>{
 try {
-      const {id}=req.param;
+      const {id}=req.params;
       const response=await electionModel.findById(id).populate('voters')
       res.status(200).json(response.voters)
 
@@ -138,25 +138,6 @@ try {
      return next(new HttpError("Error in getting  election voters",422))    
 }
 }
-
-
-
-
-
-
-
-
-
-
-//==================remove election===================================
-//Delete :api/elections/:id
-//protected (admin)
-
-const removeElection=async(req,res,next)=>{
-res.json("remove election")
-}
-
-
 
 
 
@@ -177,9 +158,9 @@ const updateElection=async(req,res,next)=>{
 try {
      //     only admin can add election
 
-// if(!req.user.isAdmin){
-//     return next(new HttpError("Only admin can perform this action",403))  
-//}
+if(!req.user.isAdmin){
+    return next(new HttpError("Only admin can perform this action",403))  
+}
 
 const {id}=req.params;
 const {title,description}=req.body;
@@ -195,7 +176,7 @@ if(thumbnail.size>1000000){
 }
 //rename the image
 
-let fileName=thumbnail.fileName
+let fileName=thumbnail.name
 fileName=fileName.split(".");
 fileName=fileName[0] + uuid() +"." + fileName[fileName.length - 1]
 
@@ -213,12 +194,39 @@ await thumbnail.mv(path.join(__dirname,'..','uploads',fileName),async(err)=>{
 
     }
     await electionModel.findByIdAndUpdate(id,{title,description,thumbnail:result.secure_url});
-    res.json("Election updated successfully")
+    res.json("Election updated successfully",200)
 
 })
 }
 } catch (error) {
       return next(new HttpError("Error in updating  election ",422))    
+}
+}
+
+
+
+
+
+
+
+//==================remove election===================================
+//Delete :api/elections/:id
+//protected (admin)
+
+const removeElection=async(req,res,next)=>{
+try {
+       //     only admin can add election
+
+if(!req.user.isAdmin){
+    return next(new HttpError("Only admin can perform this action",403))  
+}
+     const {id}=req.params;
+     await electionModel.findByIdAndDelete(id);
+     //delet election candidate that belong to this election
+     await candidateModel.deleteMany({election:id});
+     res.status(200).json("Election deleted sucessfully.")
+} catch (error) {
+    return next(new HttpError("Error in deleting  election ",422))      
 }
 }
 

@@ -4,7 +4,7 @@ import { uiActions } from '../store/ui-slice'
 import { voteActions } from '../store/vote-lice'
 
 
-function Candidate({image,id,fullName,moto}) {
+function Candidate({image,_id:id,fullName,moto}) {
 
       const dispatch=useDispatch()
 

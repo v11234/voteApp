@@ -421,10 +421,10 @@ nav {
 }
 
 .result_candidate-loader span {
-    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-variant), transparent);
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-variant));
     height: 100%;
     display: block;
-    animation: load 2s linear infinite;
+  
 
 }
 
@@ -644,10 +644,12 @@ nav {
     padding: 8rem 0;
     height: 100vh;
     text-align: center;
+ 
 }
 
 .congrats p {
     margin: 0.5rem 6 1.2rem;
+    margin-bottom: 1rem;
 }
 
 
@@ -808,6 +810,20 @@ nav {
 
 .voters_table tbody tr:nth-child(odd){
     background: var(--color-gray-0);
+}
+
+
+/* =======================LOADER===================================== */
+ .loader{
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    padding-top: 8rem;
+ }
+.loader_container{
+   width: 7rem;
+    height: 7rem;  
 }
 
 

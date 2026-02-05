@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 //middlewares
 app.use(express.json({extended:true,limit:"10mb"}));
 app.use(express.urlencoded({extended:true,limit:"10mb"}));
-app.use(cors({credentials:true,origin:['http://localhost:5173']}));
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(upload())
 
 app.use('/api',Routes);

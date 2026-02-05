@@ -1,41 +1,75 @@
-import React, { useState } from 'react'
-import { elections as dummyElections } from '../data'
+import React, { useEffect, useState } from 'react'
+// import { elections as dummyElections } from '../data'
 import Election from '../components/Election';
 import AddElectionModal from '../components/AddElectionModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { uiActions } from '../store/ui-slice';
-import AddCandidateModal from '../components/AddCandidateModal';
 import UpdateElectionModal from '../components/UpdateElectionModal';
+import Loader from '../components/Loader'
+import axios from 'axios';
+import {useNavigate } from 'react-router-dom';
 function Elections() {
 
-  const [elections,setElections]=useState(dummyElections);
+   const token=useSelector(state=>state?.vote?.currentVoter?.token);
+   const navigate=useNavigate()
+   //access control
+    //access control
+   useEffect(()=>{
+    if(!token){
+      navigate('/')
+    }
+   },[])
+
+  const [elections, setElections] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
+
   //open elections modal
-  const dispatch=useDispatch();
- const  openModal=()=>{
-   dispatch(uiActions.openElectionModal());
-   
+  const dispatch = useDispatch();
+  const openModal = () => {
+    dispatch(uiActions.openElectionModal());
+
   }
 
-  const electionModalShowing=useSelector(state=> state.ui.electionModalShowing);
-    const updateElectionModalShowing=useSelector(state=> state.ui.updateElectionModalShowing);
+  const electionModalShowing = useSelector(state => state.ui.electionModalShowing);
+  const updateElectionModalShowing = useSelector(state => state.ui.updateElectionModalShowing);
+ const isAdmin=useSelector(state=>state?.vote?.currentVoter?.isAdmin);
+
+  const getElections = async () => {
+    setIsLoading(true)
+    try {
+
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections`, { withCredentials: true, headers: { Authorization: `Bearer ${token}` } });
+      setElections(await response.data)
+
+
+
+    } catch (error) {
+      console.log(error)
+    }
+    setIsLoading(false)
+  }
+useEffect(()=>{
+getElections()
+},[])
+
   return (
- <>
-  <section className="elections">
-    <div className="container elections_container">
-    <header className="elections_header">
-      <h1>Ongoing Elections</h1>
-      <button className="btn primary" onClick={openModal}>Create New Election</button>
-    </header>
+    <>
+      <section className="elections">
+        <div className="container elections_container">
+          <header className="elections_header">
+            <h1>Ongoing Elections</h1>
+           {isAdmin && <button className="btn primary" onClick={openModal}>Create New Election</button>}
+          </header>
 
-    <menu className="election_menu">
-      {elections.map(election=><Election key={election.id} {...election}/>)}
-    </menu>
-    </div>
+         {isLoading ? <Loader/> :<menu className="election_menu">
+            {elections.map(election => <Election key={election._id} {...election} />)}
+          </menu>}
+        </div>
 
-  </section>
-  {electionModalShowing&&<AddElectionModal /> }
-  {updateElectionModalShowing&&<UpdateElectionModal/>}
- </>
+      </section>
+      {electionModalShowing && <AddElectionModal />}
+      {updateElectionModalShowing && <UpdateElectionModal />}
+    </>
   )
 }
 

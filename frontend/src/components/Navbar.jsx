@@ -4,11 +4,12 @@ import {HiOutlineBars3} from "react-icons/hi2"
 import { useEffect, useState } from "react";
 import {AiOutlineClose} from "react-icons/ai"
 import {IoMdSunny} from "react-icons/io"
+import { useSelector } from "react-redux";
 
 function Navbar() {
   const [showNav, setShowNav] = useState(window.innerWidth <768 ?false:true);
   const [darkTheme, setDarkTheme] = useState(localStorage.getItem('voting-app-theme')||"");
-
+ const token = useSelector(state => state?.vote?.currentVoter?.token);
   //Function to close nav when link is clicked on small screens
   const closeNav = () => {
     if(window.innerWidth <768){
@@ -36,8 +37,9 @@ useEffect(() => {
    <nav>
     <div className="container nav_container">
       <Link to="/" className="nav_logo">NICOLINE APP</Link>
+      
       <div>
-        {showNav &&
+       {token && showNav &&
         <menu>
           <NavLink to="/elections"onClick={closeNav}>Elections</NavLink>
            <NavLink to="/results"onClick={closeNav}>Results</NavLink>

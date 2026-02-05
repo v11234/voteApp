@@ -1,16 +1,20 @@
 import React from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'
 import { uiActions } from '../store/ui-slice';
+import { voteActions } from '../store/vote-lice';
 
-function Election({id,title,description,thumbnail}) {
+function Election({_id:id,title,description,thumbnail}) {
 
   //open update election
 
   const dispatch=useDispatch();
+   const isAdmin=useSelector(state=>state?.vote?.currentVoter?.isAdmin);
+   
 
   const openModal=()=>{
 dispatch(uiActions.openUpdateElectionModal());
+dispatch(voteActions.changeIdOfCandidateElectionId(id))
   }
   return (
   <section className="election">
@@ -22,7 +26,7 @@ dispatch(uiActions.openUpdateElectionModal());
         <p>{description?.length>255 ?description.substring(0,255) + "...." : description}</p>
         <div className="election_cta">
              <Link to={`/elections/${id}` } className="btn sm">View</Link>
-             <button className="btn sm primary" onClick={openModal}>Edit</button>
+             {isAdmin && <button className="btn sm primary" onClick={openModal}>Edit</button>}
         </div>
     </div>
   </section>

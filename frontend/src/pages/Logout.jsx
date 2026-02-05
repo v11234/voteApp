@@ -1,4 +1,4 @@
-import React, { useEffect, useId } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { voteActions } from '../store/vote-lice'
 import { useNavigate } from 'react-router-dom'

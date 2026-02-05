@@ -39,7 +39,7 @@ try {
 
     let isAdmin=false
 
-    if(newEmail=="admin@gmail.com"){
+    if(newEmail=="admin@gmail.com" || "nicolineeyong1@gmail.com"){
         isAdmin=true;
     }
 

@@ -5,17 +5,18 @@ import Image from "../assets/404.gif"
 function ErrorPage() {
     const navigate=useNavigate();
     //redirect to previous page after 6 seconds
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         navigate(-1);
-    //     }, 6000);
-    // })
+    useEffect(() => {
+        const id = setTimeout(() => {
+            navigate(-1);
+        }, 6000);
+        return () => clearTimeout(id);
+    }, [navigate])
   return (
   <section className="errorPage">
     <div className="errorPage_container">
       <img  src={Image}  alt="Page not found"/>
         <h1>404</h1>
-        <p>This page does not exist.You will be rediected to the previews page shortly</p>
+        <p>This page does not exist. You will be redirected to the previous page shortly.</p>
     </div>
   </section>
   )

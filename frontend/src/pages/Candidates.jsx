@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 // import {candidates as dummyCandidate} from '../data'
 import Candidate from '../components/Candidate';
 import ConfirmVote from '../components/ConfirmVote';
@@ -16,7 +16,7 @@ function Candidates() {
     if(!token){
       navigate('/')
     }
-   },[])
+   },[token,navigate])
  const [candidates,setCandidate]=useState([])
   const {id:selectedElection}=useParams();
   const [canVote,setCanVote]=useState(true)
@@ -51,22 +51,24 @@ const getVoter=async()=>{
 
 
  useEffect(()=>{
-    getCandidates();
-    getVoter()
-   },[]);
+    if(token){
+      getCandidates();
+      getVoter()
+    }
+   },[selectedElection, token]);
   return (
     <>
  <section className="candidates">
   {!canVote ?
    <header className="candidates_header">
     <h2 className="candidates_title">Already voted</h2>
-    <p>You are only permited to vote ones in each election.Please vote in another election</p>
+    <p>You are only permitted to vote once in each election. Please vote in another election.</p>
   </header>
   
   :<>
  {candidates.length > 0   ?  <header className="candidates_header">
     <h2 className="candidates_title">Vote your candidate</h2>
-    <p>These are candidate for the election.Please vote once and wisely,because you won't be allow to vote in this election again</p>
+    <p>These are candidates for the election. Please vote once and wisely, because you won't be allowed to vote in this election again.</p>
 
   </header>: <header className="candidates_header">
     <h2 className="candidates_title">Inactive Election</h2>

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 // import { elections} from "../data"
 // import { candidates } from '../data'
 // import { voters } from '../data'
-import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import ElectionCandidate from '../components/ElectionCandidate'
 import { IoMdAddCircleOutline } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux'
@@ -19,7 +19,7 @@ function ElectionDetails() {
     if(!token){
       navigate('/')
     }
-   },[])
+   },[token,navigate])
 
 
 
@@ -31,7 +31,7 @@ function ElectionDetails() {
 
 
   const [isLoading, setIsLoading] = useState(false)
-  const [election, setElection] = useState([]);
+  const [election, setElection] = useState({});
   const [candidates, setCandidates] = useState([]);
   const [voters, setVoters] = useState([]);
   const { id } = useParams()
@@ -90,14 +90,16 @@ function ElectionDetails() {
 
 
   useEffect(() => {
-    getElections()
-    getCandidates()
-    getVoters()
-  }, [])
+    if(token){
+      getElections()
+      getCandidates()
+      getVoters()
+    }
+  }, [id, token])
   return (
     <>
       <section className="electionDetails">
-        <div className="conatainer electionDetail_container">
+        <div className="container electionDetail_container">
           <h2>{election.title}</h2>
           <p>{election.description}</p>
           <div className="electionDetails_image">
@@ -113,16 +115,20 @@ function ElectionDetails() {
             <h2>Voters</h2>
             <table className='voters_table'>
               <thead>
-                <th><h5>Full Name</h5></th>
-                <th><h5>Email</h5></th>
-                <th><h5>Time</h5></th>
+                <tr>
+                  <th><h5>Full Name</h5></th>
+                  <th><h5>Email</h5></th>
+                  <th><h5>Time</h5></th>
+                </tr>
+              </thead>
+              <tbody>
                 {voters.map(voter => <tr key={voter._id}>
                   <td><h5>{voter.fullName}</h5></td>
                   <td><p>{voter.email}</p></td>
-                  <td><p>{voter.createdAt}</p>t</td>
+                  <td><p>{voter.createdAt}</p></td>
                 </tr>
                 )}
-              </thead>
+              </tbody>
 
             </table>
           </menu>

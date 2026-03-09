@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
     if(!token){
       navigate('/')
     }
-   },[])
+   },[token,navigate])
 
 
 
@@ -36,8 +36,10 @@ import { useNavigate } from 'react-router-dom';
 
 
   useEffect(()=>{
-    getElections()
-  },[])
+    if(token){
+      getElections()
+    }
+  },[token])
   return (
  <section className="results">
   <div className="container result_container">

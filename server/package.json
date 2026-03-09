@@ -18,6 +18,8 @@
     "express-fileupload": "^1.5.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
+    "resend": "^6.5.2",
+    "socket.io": "^4.8.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

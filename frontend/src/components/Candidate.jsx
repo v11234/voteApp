@@ -1,4 +1,3 @@
-import React from 'react'
 import { useDispatch } from 'react-redux'
 import { uiActions } from '../store/ui-slice'
 import { voteActions } from '../store/vote-lice'

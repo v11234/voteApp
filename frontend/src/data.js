@@ -50,7 +50,7 @@ export const candidates=[
         id:"c1",
         fullName:"vanetti aime junior",
         image:Candidate1,
-        moto:"For a better Havard County",
+        moto:"For a better Harvard County",
         voteCount:4000,
         election:"el",
     },

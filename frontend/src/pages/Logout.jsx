@@ -4,19 +4,18 @@ import { voteActions } from '../store/vote-lice'
 import { useNavigate } from 'react-router-dom'
 
 function Logout() {
-  const dispatch=useDispatch()
-  const navigate=useNavigate()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(voteActions.changeCurrentVoter(null))
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem('currentUser')
+    localStorage.removeItem('admin2faToken')
+    localStorage.removeItem('faceEnrollToken')
     navigate('/')
+  }, [dispatch, navigate])
 
-  },[])
-  return (
-   <></>
-  )
+  return <></>
 }
 
 export default Logout

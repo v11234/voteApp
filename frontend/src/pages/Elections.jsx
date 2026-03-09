@@ -18,7 +18,7 @@ function Elections() {
     if(!token){
       navigate('/')
     }
-   },[])
+   },[token,navigate])
 
   const [elections, setElections] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
@@ -49,8 +49,10 @@ function Elections() {
     setIsLoading(false)
   }
 useEffect(()=>{
-getElections()
-},[])
+if(token){
+  getElections()
+}
+},[token])
 
   return (
     <>

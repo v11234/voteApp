@@ -5,12 +5,13 @@ import {Link } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import Loader from './Loader';
+import socket from '../socket';
 
 function ResultElection({_id:id,thumbnail,title}) {
     const [totalVotes, setTotalVotes] = useState(0);
      const token=useSelector(state=>state?.vote?.currentVoter?.token);
      const [isLoading,setIsLoading]=useState(false)
-    //get cadidate that belong to this election
+    //get candidates that belong to this election
     const[electionCandidates,setElectionCandidates]=useState([])
 
     const getCandidate = async () => {
@@ -46,8 +47,32 @@ function ResultElection({_id:id,thumbnail,title}) {
 
 
    useEffect(()=>{
-    getCandidate()
-   },[])
+    if(token){
+      getCandidate()
+    }
+   },[id, token])
+
+   useEffect(() => {
+    if (!token) return;
+    if (!socket.connected) {
+      socket.connect();
+    }
+    const handler = (payload) => {
+      if (payload?.electionId === id) {
+        const candidates = payload.candidates || [];
+        setElectionCandidates(candidates);
+        const total = candidates.reduce(
+          (acc, candidate) => acc + (candidate.voteCount || 0),
+          0
+        );
+        setTotalVotes(total);
+      }
+    };
+    socket.on("vote_update", handler);
+    return () => {
+      socket.off("vote_update", handler);
+    };
+  }, [id, token]);
   return (
     <>
     {isLoading ? <Loader/>:

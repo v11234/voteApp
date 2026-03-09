@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux';
 import { uiActions } from '../store/ui-slice';
@@ -49,12 +49,12 @@ function AddCandidateModal() {
                         <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} />
                     </div>
                     <div>
-                        <h6>Candidate moto </h6>
+                        <h6>Candidate motto</h6>
                         <input type="text" value={moto} onChange={(e) => setMoto(e.target.value)} />
                     </div>
                     <div>
                         <h6>Candidate Image</h6>
-                        <input type="file" onChange={(e) => setImage(e.target.files[0])} accept='png jpg jpeg webp avif' />
+                        <input type="file" onChange={(e) => setImage(e.target.files[0])} accept=".png,.jpg,.jpeg,.webp,.avif" />
                     </div>
                     <button type="submit" className="btn primary">Add candidate</button>
                 </form>

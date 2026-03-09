@@ -53,8 +53,10 @@ function ConfirmVote({selectedElection}) {
     }
 
     useEffect(()=>{
-        fetchCandidate()
-    },[])
+        if(selectedVoteCandidate){
+          fetchCandidate()
+        }
+    },[selectedVoteCandidate, token])
   return (
     <div>
         <section className="modal">

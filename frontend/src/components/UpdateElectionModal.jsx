@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import { useDispatch, useSelector } from 'react-redux';
 import { uiActions } from '../store/ui-slice';
@@ -21,7 +21,7 @@ function UpdateElectionModal() {
     dispatch(uiActions.closeUpdateElectionModal());
   };
 
-  const fetchElections = async () => {
+  const fetchElections = useEffectEvent(async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections/${idOfElectionToUpdate}`, {
         withCredentials: true,
@@ -35,7 +35,7 @@ function UpdateElectionModal() {
     } catch (error) {
       console.log(error);
     }
-  };
+  });
 
   const updateElection = async (e) => {
     e.preventDefault();
@@ -62,8 +62,10 @@ function UpdateElectionModal() {
   };
 
   useEffect(() => {
-    fetchElections();
-  }, []);
+    if (idOfElectionToUpdate && token) {
+      fetchElections();
+    }
+  }, [idOfElectionToUpdate, token]);
 
   return (
     <section className="modal">

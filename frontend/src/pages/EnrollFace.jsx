@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import FaceCapture from '../components/FaceCapture'
 
+const FACE_DESCRIPTOR_LENGTH = 128
+
 function EnrollFace() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -26,7 +28,7 @@ function EnrollFace() {
       return
     }
 
-    if (!Array.isArray(faceEmbedding) || faceEmbedding.length !== 256 || !faceImageData) {
+    if (!Array.isArray(faceEmbedding) || faceEmbedding.length !== FACE_DESCRIPTOR_LENGTH || !faceImageData) {
       setError('Please start camera and capture your face first.')
       return
     }

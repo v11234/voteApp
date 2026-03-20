@@ -43,8 +43,8 @@ const generateFaceEnrollToken = (id) => generateToken({ id, type: "face-enroll" 
 
 const normalizeOtp = (value) => String(value ?? "").trim().replace(/[\s-]/g, "");
 
-const FACE_EMBEDDING_LENGTH = 256;
-const FACE_MATCH_THRESHOLD = Number.parseFloat(process.env.FACE_MATCH_THRESHOLD || "0.82");
+const FACE_EMBEDDING_LENGTH = 128;
+const FACE_MATCH_THRESHOLD = Number.parseFloat(process.env.FACE_MATCH_THRESHOLD || "0.68");
 
 const sanitizeFaceEmbedding = (input) => {
   if (!Array.isArray(input)) {
@@ -71,19 +71,13 @@ const sanitizeFaceImageData = (value) => {
   return normalized;
 };
 
-const cosineSimilarity = (a, b) => {
-  let dot = 0;
-  let normA = 0;
-  let normB = 0;
+const euclideanDistance = (a, b) => {
+  let sum = 0;
   for (let i = 0; i < a.length; i += 1) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
+    const delta = a[i] - b[i];
+    sum += delta * delta;
   }
-  if (!normA || !normB) {
-    return -1;
-  }
-  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+  return Math.sqrt(sum);
 };
 
 const sendEmailOtp = async (email, otp, context) => {
@@ -136,6 +130,7 @@ const resendEmailOtp = async (req, res, next) => {
     try {
       await sendEmailOtp(user.email, otp, "register");
     } catch (err) {
+      console.error("Failed to resend email OTP", err);
       await logAudit({
         action: "voter.email_otp_send_failed",
         actor: user._id,
@@ -144,6 +139,7 @@ const resendEmailOtp = async (req, res, next) => {
         userAgent: req.headers["user-agent"],
         meta: { error: err.message },
       });
+      return next(new HttpError("Could not send OTP email. Check your email settings and try again.", 502));
     }
     await logAudit({
       action: "voter.email_otp_resent",
@@ -234,6 +230,7 @@ const registerVoter = async (req, res, next) => {
     try {
       await sendEmailOtp(newEmail, otp, "register");
     } catch (err) {
+      console.error("Failed to send registration email OTP", err);
       await logAudit({
         action: "voter.email_otp_send_failed",
         actor: newVoter._id,
@@ -242,6 +239,7 @@ const registerVoter = async (req, res, next) => {
         userAgent: req.headers["user-agent"],
         meta: { error: err.message },
       });
+      return next(new HttpError("Account created, but the OTP email could not be sent. Check your email settings and use resend OTP after fixing them.", 502));
     }
 
     await logAudit({
@@ -470,8 +468,8 @@ const loginVoter = async (req, res, next) => {
       return next(new HttpError("Face scan is required to login.", 422));
     }
 
-    const faceScore = cosineSimilarity(voter.faceEmbedding, sanitizedFaceEmbedding);
-    if (faceScore < FACE_MATCH_THRESHOLD) {
+    const faceDistance = euclideanDistance(voter.faceEmbedding, sanitizedFaceEmbedding);
+    if (faceDistance > FACE_MATCH_THRESHOLD) {
       return next(new HttpError("Face verification failed. Please try again with better lighting.", 403));
     }
 
@@ -480,7 +478,20 @@ const loginVoter = async (req, res, next) => {
       voter.twoFactorOtpHash = hashOtp(otp);
       voter.twoFactorOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
       await voter.save();
-      await sendEmailOtp(voter.email, otp, "login");
+      try {
+        await sendEmailOtp(voter.email, otp, "login");
+      } catch (err) {
+        console.error("Failed to send admin 2FA email OTP", err);
+        await logAudit({
+          action: "admin.login_2fa_send_failed",
+          actor: voter._id,
+          actorRole: voter.role,
+          ip: req.ip,
+          userAgent: req.headers["user-agent"],
+          meta: { error: err.message },
+        });
+        return next(new HttpError("Could not send the admin verification email. Check your email settings and try again.", 502));
+      }
       const tempToken = generateToken({ id: voter._id, type: "2fa" }, "10m");
       return res.json({ requires2FA: true, tempToken });
     }

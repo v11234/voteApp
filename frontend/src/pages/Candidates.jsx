@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 // import {candidates as dummyCandidate} from '../data'
 import Candidate from '../components/Candidate';
@@ -23,7 +23,7 @@ function Candidates() {
 
  const voterId=useSelector(state=>state?.vote?.currentVoter?.id);
   const voteCandidateModalShowing=useSelector(state=> state.ui.voteCandidateModalShowing);
-   const getCandidates=async()=>{
+   const getCandidates = useEffectEvent(async () => {
 try {
     const responds= await axios.get(`${import.meta.env.VITE_API_URL}/elections/${selectedElection}/candidates`,{withCredentials:true,headers:{Authorization:`Bearer ${token}`}});
     const candidates=await responds.data
@@ -31,21 +31,20 @@ try {
      
 } catch (error) {
     console.error(error)
-}}
+}})
  
 
 //CHECK IF VOTER HAS ALREDY VOTED
 
-const getVoter=async()=>{
+const getVoter = useEffectEvent(async () => {
   try {
      const responds= await axios.get(`${import.meta.env.VITE_API_URL}/voters/${voterId}`,{withCredentials:true,headers:{Authorization:`Bearer ${token}`}});
      const votedElections=await responds.data.votedElections;
-     if(votedElections.includes(selectedElection))
-      setCanVote(false)
+     setCanVote(!votedElections.includes(selectedElection))
   } catch (error) {
     console.error(error)
   }
-}
+})
 
 
 
@@ -55,7 +54,7 @@ const getVoter=async()=>{
       getCandidates();
       getVoter()
     }
-   },[selectedElection, token]);
+   },[selectedElection, token, voterId]);
   return (
     <>
  <section className="candidates">

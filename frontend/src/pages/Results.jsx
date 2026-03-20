@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react'
+import  { useEffect, useEffectEvent, useState } from 'react'
 // import { elections as dummyElections } from '../data';
 import ResultElection from '../components/ResultElection';
 import axios from 'axios';
@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 
   const [elections, setElections] = useState([]);
-  const getElections=async()=>{
+  const getElections = useEffectEvent(async () => {
     try {
      
     const responds= await axios.get(`${import.meta.env.VITE_API_URL}/elections`,{withCredentials:true,headers:{Authorization:`Bearer ${token}`}});
@@ -31,8 +31,7 @@ import { useNavigate } from 'react-router-dom';
   } catch (error) {
     console.error(error)
   }
-
-  }
+  })
 
 
   useEffect(()=>{

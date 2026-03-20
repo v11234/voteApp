@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import FaceCapture from '../components/FaceCapture'
 
+const FACE_DESCRIPTOR_LENGTH = 128
+
 function Register() {
   const [userData, setUserData] = useState({
     fullName: '',
@@ -30,7 +32,7 @@ function Register() {
 
   const registerVoter = async (e) => {
     e.preventDefault()
-    if (!Array.isArray(userData.faceEmbedding) || userData.faceEmbedding.length !== 256 || !userData.faceImageData) {
+    if (!Array.isArray(userData.faceEmbedding) || userData.faceEmbedding.length !== FACE_DESCRIPTOR_LENGTH || !userData.faceImageData) {
       setError('Please start camera and capture your face before registering.')
       return
     }

@@ -17,6 +17,30 @@ function Landing() {
   const [candidatesByElection, setCandidatesByElection] = useState({})
   const [candidateLoadByElection, setCandidateLoadByElection] = useState({})
 
+  const fetchPublicElections = async () => {
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections/public`, {
+        headers: { 'Cache-Control': 'no-cache' },
+      })
+      const payload = response.data
+
+      if (Array.isArray(payload)) {
+        setElections(payload)
+        setTotalEligibleVoters(0)
+      } else {
+        setElections(payload?.elections || [])
+        setTotalEligibleVoters(payload?.totalEligibleVoters || 0)
+      }
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to load elections preview.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (token) {
       navigate('/results')
@@ -24,25 +48,6 @@ function Landing() {
   }, [token, navigate])
 
   useEffect(() => {
-    const fetchPublicElections = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections/public`)
-        const payload = response.data
-
-        if (Array.isArray(payload)) {
-          setElections(payload)
-          setTotalEligibleVoters(0)
-        } else {
-          setElections(payload?.elections || [])
-          setTotalEligibleVoters(payload?.totalEligibleVoters || 0)
-        }
-      } catch (err) {
-        setError(err?.response?.data?.message || 'Failed to load elections preview.')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     fetchPublicElections()
   }, [])
 
@@ -116,7 +121,12 @@ function Landing() {
         <section className="landing_preview">
           <h2>Ongoing Elections</h2>
           <p className="landing_meta">Eligible voters: {totalEligibleVoters || 0}</p>
-          {error && <p className="form_error-message">{error}</p>}
+          {error && (
+            <>
+              <p className="form_error-message">{error}</p>
+              <button type="button" className="btn" onClick={fetchPublicElections}>Retry Preview</button>
+            </>
+          )}
           {isLoading ? (
             <p>Loading elections...</p>
           ) : previewElections.length === 0 ? (

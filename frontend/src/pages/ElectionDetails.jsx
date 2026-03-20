@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 // import { elections} from "../data"
 // import { candidates } from '../data'
 // import { voters } from '../data'
@@ -49,7 +49,7 @@ function ElectionDetails() {
   }
 
 
-  const getElections = async () => {
+  const getElections = useEffectEvent(async () => {
     setIsLoading(true)
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections/${id}`, { withCredentials: true, headers: { Authorization: `Bearer ${token}` } });
@@ -58,25 +58,25 @@ function ElectionDetails() {
       console.log(error)
     }
     setIsLoading(false)
-  }
+  })
 
-  const getCandidates = async () => {
+  const getCandidates = useEffectEvent(async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections/${id}/candidates`, { withCredentials: true, headers: { Authorization: `Bearer ${token}` } });
       setCandidates(await response.data)
     } catch (error) {
       console.log(error)
     }
-  }
+  })
 
-  const getVoters = async () => {
+  const getVoters = useEffectEvent(async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/elections/${id}/voters`, { withCredentials: true, headers: { Authorization: `Bearer ${token}` } });
       setVoters(await response.data)
     } catch (error) {
       console.log(error)
     }
-  }
+  })
 
   const deleteElection = async () => {
     try {
@@ -100,6 +100,7 @@ function ElectionDetails() {
     <>
       <section className="electionDetails">
         <div className="container electionDetail_container">
+          {isLoading && <p>Loading election...</p>}
           <h2>{election.title}</h2>
           <p>{election.description}</p>
           <div className="electionDetails_image">

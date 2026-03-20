@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useEffectEvent, useState } from 'react'
 // import { candidates } from '../data'
 import { useDispatch, useSelector } from 'react-redux';
 import { uiActions } from '../store/ui-slice';
@@ -27,7 +27,7 @@ function ConfirmVote({selectedElection}) {
 
     //GET SELECTED CANDIDATE 
 
-    const fetchCandidate=async()=>{
+    const fetchCandidate = useEffectEvent(async () => {
      try {
          const responds= await axios.get(`${import.meta.env.VITE_API_URL}/candidates/${selectedVoteCandidate}`,{withCredentials:true,headers:{Authorization:`Bearer ${token}`}});
     
@@ -35,7 +35,7 @@ function ConfirmVote({selectedElection}) {
      } catch (error) {
         console.error(error)
      }
-    }
+    })
 
     //confirm vote for a selected candidate
      const confirmVote=async()=>{

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useEffectEvent, useState } from 'react'
 // import { elections as dummyElections } from '../data'
 import Election from '../components/Election';
 import AddElectionModal from '../components/AddElectionModal';
@@ -34,7 +34,7 @@ function Elections() {
   const updateElectionModalShowing = useSelector(state => state.ui.updateElectionModalShowing);
  const isAdmin=useSelector(state=>state?.vote?.currentVoter?.isAdmin);
 
-  const getElections = async () => {
+  const getElections = useEffectEvent(async () => {
     setIsLoading(true)
     try {
 
@@ -47,7 +47,7 @@ function Elections() {
       console.log(error)
     }
     setIsLoading(false)
-  }
+  })
 useEffect(()=>{
 if(token){
   getElections()
